@@ -15,4 +15,4 @@ if you want to use googlesheet Datas
 
 
 ## Download
-See the [releases page](https://github.com/gquesnot/Site_Auto/releases) 
+See the [releases page](https://github.com/gquesnot/Site_AutoPyppeteer/releases) 
