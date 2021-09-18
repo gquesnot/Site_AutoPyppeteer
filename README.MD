@@ -1,17 +1,29 @@
 # SITE AUTOPUPPETEER
 
-## INSTALLATION
+## INSTALLATION ON WINDOWS
+
 ```
+    python3 -m pip install --upgrade pip
+    python3 -m venv .env
+    .\.env\Scripts\activate.bat
     pip install -r requirements.txt
     python manage.py runserver
 ```
 
+
+#### if you have problem see
+- https://www.python.org/downloads/
+- https://docs.python.org/3/library/venv.html
+- https://docs.python.org/3/using/windows.html
+- https://docs.python.org/3/using/unix.html
+
+
 ### Google Spreedsheet
 if you want to use googlesheet Datas
-- create an google project with google sheet api
+- create a Google project with Google sheet api
 - create an Auth2 with url http://localhost/ if local or your url
 - rename and store your Auth2 credentials.json  in this path AAPyppeteer/util/credentials.json
-- the first time you run a project with a google spreadsheet a pop up will open to access the application
+- the first time you run a project with a Google spreadsheet a pop-up will open to access the application
 - login in 
 
 
