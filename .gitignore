@@ -1,0 +1,8 @@
+.env
+db.sqlite3
+.idea
+/static/img
+/static/files
+/static/filesOut
+__pycache__
+util/__pycache__

@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+
+{% block css %}
+
+{% endblock %}
+{% csrf_token %}
+{% block content %}
+    <h2 class="mb-4 text-center">Blocks</h2>
+    <div class="d-flex flex-column justify-content-center">
+        <div class="d-flex justify-content-between">
+            <div style="width: 47.5%;">
+                <form class="mb-3" method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group mb-3">
+                        <label for="new_block_name">New Block</label>
+                        <input class="form-control" id="new_block_name" name="new_block_name" type="text">
+
+                    </div>
+                    <div class="form-group">
+                        <label for="blockType">Select Type</label>
+                        <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" name="blockType"
+                                id="blockType">
+
+
+                            <option value="Basic">Basic</option>
+                            <option value="Datas">Datas</option>
+
+                        </select>
+                    </div>
+                    <button class="btn btn-success" id="newBlock">Create</button>
+                </form>
+            </div>
+            <div style="width: 47.5%;">
+                <div class="form-group">
+                    <label for="confBlock">Configure a block</label>
+                    <select class="blockSelect custom-select custom-select-lg mb-3" id="confBlock">
+                        {% for block in blocks %}
+                            <option value="{{ block.id }}">{{ block.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                </div>
+                <button class="btn btn-danger" id="btnDelBlock">delete</button>
+            </div>
+        </div>
+        <h3 class="mt-3">Actions</h3>
+        <div class="d-flex justify-content-between mb-5">
+            <div class="d-flex flex-column" id="divUpperTable" style="width: 47.5%;">
+                {% include 'tab.html' with items=baseblock type='project' %}
+            </div>
+            <div class="d-flex flex-column" style="width: 47.5%;">
+                <div class="form-group">
+                    <h3 class="mb-3">Add an Action</h3>
+                    <select class="custom-select custom-select-lg mb-3" id="baseaction">
+                        {% for baseAction in baseActions %}
+                            <option value="{{ baseAction.counter }}">{{ baseAction.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-6">
+                    {% for action in baseActions %}
+                        <div data-id="{{ action.id }}" data-counter="{{ action.counter }}"
+                             class="baseActionForm justify-content-around flex-wrap" style="display:flex">
+                            {% for el in action.elements.all %}
+                                <div style="width:47.5%;align-self:center" class="form-group mb-3">
+                                    <label for="{{ el.name }}_{{ el.id }}">{{ el.ask }}</label>
+                                    <input class="form-control" data-id="{{ el.id }}" type="text"
+                                           name="{{ el.name }}_{{ el.id }}">
+
+                                </div>
+
+                            {% endfor %}
+                            <div style="width: 100%" class="d-flex justify-content-center">
+                                <button class="btn btn-success addAction" type="submit">Add Action</button>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block javascript %}
+    <script type="text/javascript">
+        var blockId = 0
+        var actionId = 0
+        var baseaction = $('#baseaction')
+        var baseActionForm = $('div.baseActionForm')
+        var addAction = $('.addAction')
+        var confBlock = $('#confBlock')
+        var csrf_token = '{{ csrf_token }}'
+        var tableDiv = $('#divUpperTable')
+        var newBlock = $('#newBlock')
+
+
+        var addblockUrl = "{% url 'addblock' %}"
+
+        if (confBlock[0].options.length > 0) {
+            blockId = confBlock[0].options[confBlock[0].options.selectedIndex].value
+            loadBlock()
+
+        }
+
+
+        // createANewBlock
+        newBlock.click(function (e) {
+            e.preventDefault()
+
+            createANewBlock(this)
+        })
+
+
+        // toggle row on table
+        baseActionForm.hide()
+        switchAction(0)
+        baseaction.change(function (e) {
+            e.preventDefault()
+            baseActionForm.hide()
+            switchAction(this.options.selectedIndex)
+        })
+
+
+        //addAction
+        addAction.click(function (e) {
+            e.preventDefault()
+            addAnAction(this)
+        })
+
+        //changeBlock
+        confBlock.change(function (e) {
+            e.preventDefault()
+            blockId = this.options[this.options.selectedIndex].value
+            loadBlock()
+
+
+        })
+
+
+
+
+
+        function loadBlock() {
+
+            var request = new Request(reCreateUrl("{% url 'getblock' 0 %}", [blockId]))
+            fetch(request)
+                .then(function (response) {
+                    return response.text();
+                }).then(function (datas) {
+                tableDiv.html(datas)
+                loadSortable()
+
+            })
+        }
+
+        function createANewBlock(target) {
+            let newBlockName = $('#new_block_name').val()
+            var formData = new FormData()
+            formData.append("name", newBlockName)
+            formData.append("csrfmiddlewaretoken", csrf_token)
+            formData.append("type", $('#blockType')[0].options[$('#blockType')[0].selectedIndex].value)
+
+            const request = new Request(addblockUrl, {method: 'POST', body: formData})
+            fetch(request)
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                //new option
+                let o = new Option(data.name, data.id);
+                confBlock.append(o)
+                $(confBlock.children()[confBlock[0].options.length - 1]).prop('selected', true)
+                blockId = data.id
+                loadBlock()
+
+
+            })
+        }
+
+
+        function addAnAction(target) {
+
+            let baseActionId = $(target).parent().parent().data('id')
+            let baseUrl = "{% url 'addaction' 0 0%}"
+            let url = reCreateUrl(baseUrl, [blockId, baseActionId])
+
+            let formData = new FormData()
+            formData.append("csrfmiddlewaretoken", csrf_token)
+            let answers = {}
+            $(target).parent().parent().find("input").each(function (i) {
+                let input = $(this)
+                let name = input[0].name.split('_')[0]
+                if (name === "name") {
+                    formData.append('name', input[0].value)
+                }
+                answers[input.data('id')] = input.val()
+
+            })
+            formData.append("answers", JSON.stringify(answers))
+            const request = new Request(url, {method: 'POST', body: formData})
+            fetch(request)
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                loadBlock()
+            })
+        }
+
+
+        function switchAction(index) {
+            actionId = $(baseActionForm[index]).data('id')
+            baseActionForm.hide()
+            $(baseActionForm[index]).show()
+
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+
+    <h2 class="mb-4">{{ project.name }}</h2>
+
+    <div class="d-flex justify-content-between mb-5">
+        <div class="d-flex flex-column" style="width: 47.5%;">
+            <h3 class="mt-3 mb-2">Project Blocks</h3>
+            <div id="divUpperTable">
+                {% include 'tab.html' with items=project.blocks.all type='project' %}
+            </div>
+
+
+        </div>
+
+        <div class="d-flex flex-column" style="width: 47.5%;">
+            <h3 class="mb-2 mt-3">Add a Block</h3>
+            <div class="form-group">
+                <label for="blockConfig">Select a block</label>
+                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="blockConfig" name="blockConfig">
+
+                    {% for block in blocks %}
+                        <option value="{{ block.id }}">{{ block.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="blockName">Block Name</label>
+                <input class="form-control projectInput" id="blockName" name="blockName" type="text"
+                       value=>
+            </div>
+
+
+
+            <div class="form-group">
+                <label for="dataInConfig">Select dataIn</label>
+                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="dataInConfig" name="dataInConfig">
+                    <option value="0">None</option>
+                    {% for data in datasIn %}
+                        <option value="{{ data.id }}">{{ data.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        <div class="form-group">
+                <label for="dataOutConfig">Select dataOut</label>
+                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="dataOutConfig" name="dataOutConfig">
+                    <option value="0">None</option>
+                    {% for data in datasOut %}
+                        <option value="{{ data.id }}">{{ data.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="isLinkedToNext">
+                <label class="form-check-label" for="isLinkedToNext">is outpout linked to next block ?</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="isAdvanced">
+                <label class="form-check-label" for="isAdvanced">Advanced ?</label>
+            </div>
+            <div class="form-group mb-3">
+                <label for="nbPage">Number of Thread/Page</label>
+                <input class="form-control projectInput" id="nbPage" name="nbPage" type="text" disabled>
+
+            </div>
+            <div class="form-group mb-3">
+                <label for="dataBlock">Array/Dict</label>
+                <textarea class="form-control projectInput" id="dataBlock" name="dataBlock"
+                          rows="3" disabled>[]</textarea>
+
+            </div>
+            <div class="form-group mb-3">
+                <input class="btn btn-primary form-control" id="addBlockProject" value="Add" type="submit">
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="d-flex justify-content-center mb-5" style="margin: 0 auto 2rem auto">
+        <button style="width: 45%" id="runProject" class="btn btn-success">Run Project</button>
+    </div>
+    <div id="urlContent" class="mt-5">
+        {% include 'projecturl.html' with data=project.datasOutUrl %}
+    </div>
+    <div id="imgContent" class="mt-5">
+        {% include 'carousel.html' with items=project.images.all %}
+
+    </div>
+
+
+
+    <div class="pb-5 mb-5"></div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        var isAdvancedInput = $('#isAdvanced')
+        var addBlockBtn = $('#addBlockProject')
+        var blockConfig = $('#blockConfig')
+        var projectPk = getPk()
+        var csrf_token = '{{ csrf_token }}'
+        var tableDiv = $('#divUpperTable')
+        var runProjectBtn = $('#runProject')
+        var dataInConfig = $('#dataInConfig')
+        var dataOutConfig = $('#dataOutConfig')
+        var isLinkedToNext = $('#isLinkedToNext')
+
+        runProjectBtn.after("<div style=\"position: relative;top:2px;left:20px\" class=\"spinner-border text-success\" role=\"status\">"+
+        "<span  class=\"sr-only\">Loading...</span>"+
+        "</div>")
+        runProjectBtn.next().hide()
+        isAdvancedInput.click(function () {
+            $('#nbPage').prop('disabled', function (i, v) {
+                return !v;
+            });
+            $('#dataBlock').prop('disabled', function (i, v) {
+                return !v;
+            });
+        })
+
+        addBlockBtn.click(function (e) {
+            e.preventDefault();
+            addABlock(this)
+        })
+
+        runProjectBtn.click(function (e) {
+            e.preventDefault()
+            runProject()
+        })
+
+        function runProject() {
+            runProjectBtn.next().show()
+            let request = new Request(reCreateUrl("{% url 'runproject' 0 %}", [projectPk]), {method: 'GET'})
+            fetch(request)
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                console.log(data)
+                $('#imgContent').html(data['images'])
+                $('#urlContent').html(data['url'])
+                console.log(data['url'])
+                runProjectBtn.next().hide()
+
+
+            })
+        }
+
+
+        function addABlock(target) {
+            let baseUrl = "{% url 'addblock_project' 0%}"
+            let url = reCreateUrl(baseUrl, [projectPk])
+
+            let formData = new FormData()
+            let datas = $('#dataBlock').val() ?? "[]"
+            let nbPage = $('#nbPage').val() ?? "0"
+            formData.append("csrfmiddlewaretoken", csrf_token)
+            formData.append("id", blockConfig[0].options[blockConfig[0].selectedIndex].value)
+            formData.append("name", $('#blockName').val())
+            formData.append("nbThread", nbPage)
+            formData.append("isAdvanced", isAdvancedInput[0].checked)
+            formData.append("isLinkedToNext", isLinkedToNext[0].checked)
+            formData.append("datas", datas)
+            formData.append("datasIn",dataInConfig[0].options[dataInConfig[0].selectedIndex].value)
+            formData.append("datasOut",dataOutConfig[0].options[dataOutConfig[0].selectedIndex].value)
+
+
+            const request = new Request(url, {method: 'POST', body: formData})
+            fetch(request)
+                .then(function (response) {
+                    return response.text();
+                }).then(function (data) {
+                tableDiv.html(data)
+
+            })
+        }
+
+        function loadBlocks() {
+            var request = new Request(reCreateUrl("{% url 'getblocks_project' 0 %}", [projectPk]))
+            fetch(request)
+                .then(function (response) {
+                    return response.text();
+                }).then(function (datas) {
+                tableDiv.html(datas)
+
+            })
+        }
+
+
+    </script>
+{% endblock %}

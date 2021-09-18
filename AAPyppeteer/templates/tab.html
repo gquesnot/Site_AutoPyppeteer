@@ -1,0 +1,233 @@
+<div class="mb-3 mt-2" id="divScrollTab" style="max-height: 700px;overflow: auto">
+    <table class="table table-striped" data-id="-1">
+        <thead class="thead-dark">
+        <tr>
+            {% if type == "project" %}
+                <th style="width: 10%;padding-left: 0.75rem" scope="col">#</th>
+                <th style="width: 20%" scope="col">Name</th>
+                <th style="width: 20%" scope="col">isAdvanced</th>
+                <th style="width: 20%" scope="col">baseName</th>
+                <th style="width: 30%" scope="col"></th>
+            {% else %}
+                <th style="width: 10%" scope="col">#</th>
+
+                <th scope="col" style="width:30%">Name</th>
+                <th scope="col" style="width:30%">Type</th>
+                <th style="width: 30%" scope="col"></th>
+
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody id="items">
+        {% for item in items %}
+            <tr data-id="{{ item.id }}" data-position="{{ item.position }}" class="myrow">
+                {% if type == "project" %}
+                    <td colspan="6">
+                        <div class="d-flex flex-column justify-center">
+                            <div class="d-flex justify-content-between w-100">
+                                <div style="width:10%">{{ item.counter }}</div>
+                                <div style="width:20%;margin-left: 0.25rem">{{ item.name }}</div>
+                                <div style="width:20%;margin-left: 0.5rem">{{ item.isAdvanced }}</div>
+                                <div style="width:20%;margin-left: 1rem">{{ item.block.name }}</div>
+                                <div style="width:15%;display:flex; justify-content: center"><a class="delActionRaw">
+                                    <svg style="position: relative;top:4px;background-color:rgba(0,0,0,0);color:red;transform:scale(2);cursor: pointer"
+                                         xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         fill="currentColor"
+                                         class="bi bi-x" viewBox="0 0 16 16">
+                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                    </svg>
+                                </a></div>
+                                <div style="width:15%;display:flex; justify-content: center"><a class="btn btn-primary selectActionRow mr-2" href="#">Edit</a>
+                                </div>
+                            </div>
+                            <div class="justify-content-around w-100 flex-wrap rowBlockData" style="display: flex;margin-top: 15px;padding: 0 15px">
+                                <div style="width:30%;align-self:center" class="form-group mb-3">
+                                    <label for="name_{{ item.id }}">Name</label>
+                                    <input class="form-control tabForm" type="text"
+                                           value="{{ item.name }}"
+                                           name="name_{{ item.id }}"
+                                           id="name_{{ item.id }}">
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input tabForm" type="checkbox"
+                                           name="isAdvanced_{{ item.id }}" id="isAdvanced_{{ item.id }}"
+                                            {% if item.isAdvanced %}
+                                           checked
+                                            {% endif %}
+                                    >
+                                    <label class="form-check-label" for="isAdvanced_{{ item.id }}">Advanced
+                                        ?</label>
+                                </div>
+                                <div style="width:30%;align-self:center" class="form-group mb-3">
+                                    <label for="nbThread_{{ item.id }}">nb Page/Thread</label>
+                                    <input class="form-control tabForm" type="text"
+                                           value="{{ item.nbThread }}"
+                                           name="nbThread_{{ item.id }}"
+                                           id="nbThread_{{ item.id }}">
+                                </div>
+                                <div style="width:80%;align-self:center" class="form-group mb-3">
+                                    <label for="datas_{{ item.id }}">Array/Dict</label>
+                                    <textarea class="form-control tabForm" id="datas_{{ item.id }}"
+                                              name="datas_{{ item.id }}"
+                                              rows="3">{{ item.datas }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                {% else %}
+                    <td colspan="6">
+                        <div class="d-flex flex-column justify-content-center">
+                            <div class="d-flex justify-content-between w-100">
+                                <div style="width:10%">{{ item.counter }}</div>
+                                <div style="width:30%;padding-left:0.25rem">{{ item.name }}</div>
+                                <div style="width:30%;padding-left:0.75rem">{{ item.type }}</div>
+                                <div style="width:15%;display:flex; justify-content: center"><a class="delActionRaw">
+                                    <svg style="position: relative;top:4px;background-color:rgba(0,0,0,0);color:red;transform:scale(2);cursor: pointer"
+                                         xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         fill="currentColor"
+                                         class="bi bi-x" viewBox="0 0 16 16">
+                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                    </svg>
+                                </a></div>
+                                <div style="width:15%;display:flex; justify-content: center"><a class="btn btn-primary selectActionRow mr-2" href="#">Edit</a>
+                                </div>
+                            </div>
+                            <div class="justify-content-around w-100 flex-wrap rowBlockData" style="display: flex;margin-top: 15px;padding: 0 15px">
+                                {% for el in item.elements.all %}
+                                    <div style="width:30%;align-self:center" class="form-group mb-3">
+                                        <label for="{{ el.name }}_{{ el.id }}">{{ el.question.ask }}</label>
+                                        <input class="form-control tabForm" data-id="{{ el.id }}" type="text"
+                                               id="{{ el.name }}_{{ el.id }}" value="{{ el.value }}"
+                                               name="{{ el.name }}_{{ el.id }}">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+
+
+    var allHidenBlock = $('.rowBlockData')
+    var tabForm = $('.tabForm')
+    var delBtn = $('.delActionRaw')
+    var allActionrow = $('.selectActionRow')
+
+    var type = '{{ type }}'
+
+
+    allHidenBlock.hide()
+    tabForm.on('focusout', function (e) {
+        e.preventDefault()
+        updateRowValue($(this))
+    })
+
+    delBtn.click(function (e) {
+        e.preventDefault()
+        delItem(this)
+    })
+
+    allActionrow.click(function (e) {
+        e.preventDefault()
+        hideEditRow($(this))
+    })
+
+    function updateRowValue(target) {
+        let id = target.parent().parent().parent().parent().parent().data('id')
+        console.log(id)
+
+        let baseUrl = type === 'block' ? "{% url 'updateaction' 0 %}" : "{% url 'updateblock' 0 %}"
+        let url = reCreateUrl(baseUrl, [id])
+        let formData = new FormData()
+        formData.append("csrfmiddlewaretoken", csrf_token)
+
+        // if is Block
+        {% if type == 'block' %}
+
+
+            target.parent().parent().find('input').each(function (index) {
+                name = this.name.split('_')[0]
+                if (name === "name") {
+                    $(target.parent().parent().parent().parent().prev().find('td')[0]).text(this.value)
+                }
+                let pk = this.id.split('_')[1]
+                formData.append(pk, this.value)
+            })
+
+            let request = new Request(url, {method: 'POST', body: formData})
+            fetch(request)
+                .then(function (response) {
+                    return response.json();
+                }).then(function (datas) {
+                //
+            })
+            //if is Project
+        {% else %}
+            target.parent().parent().find('input').each(function (idx) {
+                let el = $(this)
+                let name = this.name.split('_')[0]
+                let val = el.val()
+                if (name === 'isAdvanced') {
+                    console.log(this.checked)
+                    val = this.checked
+                    $(el.parent().parent().parent().parent().prev().find('td')[1]).text(val)
+                    formData.append(name, val)
+                } else {
+                    formData.append(name, val)
+                }
+                if (name === 'name') {
+                    $(el.parent().parent().parent().parent().prev().find('td')[0]).text(val)
+                }
+
+            })
+            console.log(target.parent().parent(), target.parent().parent().find("textarea"))
+            formData.append("datas", target.parent().parent().find("textarea")[0].value.replaceAll('\'', '"'))
+            let req = new Request(url, {method: 'POST', body: formData})
+            console.log(req)
+            fetch(req)
+                .then(function (response) {
+                    return response.text();
+                }).then(function (data) {
+                //tableDiv.html(data)
+
+            })
+
+
+        {% endif %}
+        let res = []
+
+
+    }
+
+    function delItem(target) {
+        let id = $(target).parent().parent().parent().parent().parent().data('id')
+        let baseUrl = type === 'block' ? "{% url 'deleteaction' 0 0 %}" : "{% url 'delblock_project' 0 0 %}"
+        let url = ""
+        {% if type == 'project' %}
+            url = reCreateUrl(baseUrl, [getPk(), id])
+        {% else %}
+            url = reCreateUrl(baseUrl, [dataId, id])
+        {% endif %}
+        let formData = new FormData()
+        formData.append("csrfmiddlewaretoken", csrf_token)
+        let req = new Request(url, {method: 'POST', body: formData})
+        fetch(req)
+            .then(function (response) {
+                return response.text();
+            }).then(function (data) {
+            $('tr[data-id="' + id + '"').remove()
+
+        })
+
+    }
+
+    function hideEditRow(target) {
+        target.parent().parent().next().toggle()
+    }
+
+</script>

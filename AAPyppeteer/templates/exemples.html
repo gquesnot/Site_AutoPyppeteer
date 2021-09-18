@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block style %}
+    <style>
+        .smallD {
+            margin: 1rem auto
+        }
+
+        .bigD {
+            margin: 2rem auto
+        }
+        img{
+            padding:1rem;
+            border: 3px solid rgba(0, 0, 0,0.1)
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <h1 class="text-center mb-5">Exemples</h1>
+
+    <h2 class="mb-5">Creation of a Script that will add a new project on my own Web App</h2>
+    <div class="bigD">
+        <h5>1. Enter project name and click New project</h5>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_project_creation.PNG' %}"
+             alt="">
+    </div>
+
+    <div class="bigD">
+        <h5>2. We are going to create 2 blocks for this project, the first one that we will call "login on AApy" for init / reuse and an other block for the Core part that we will call "create a new project on AppPy" </h5>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_new_bloc_1.PNG' %}" alt="">
+        <div class="smallD">
+            <p>Select "login on AApy"</p>
+            <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_new_bloc_2.PNG' %}"
+                 alt="">
+        </div>
+        <div class="smallD"><p>Select "login on AApy"</p>
+            <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_new_bloc_2.PNG' %}"
+                 alt=""></div>
+        <div class="smallD"></div>
+        <div class="smallD"></div>
+        <div class="bigD"></div>
+        <div class="bigD"></div>
+        <div class="bigD"></div>
+
+    </div>
+
+
+
+
+    <div class="bigD"><h5>3. Go on action part to create the login step</h5>
+
+        <p>First, create a go_to Action and copy the <a href="{% url 'login' %}" target="_blank">login url</a> as value</p>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_go_to_login.PNG' %}" alt="">
+
+        <p>Here you have to create 3 Actions to get logged in :</p>
+        <ul>
+            <li>Input: to fill the username</li>
+            <li>Input: to fill the password</li>
+            <li>Click: on the button</li>
+        </ul>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_input_user.PNG' %}" alt="">
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_input_pwd.PNG' %}" alt="">
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_click_signin.PNG' %}"
+             alt="">
+
+        <p>add 1 action screenshot to check if you are really logged In</p>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_screen_signin.PNG' %}"
+             alt="">
+    </div>
+    <div class="bigD">
+        <h5>4. Now you can go back to the top of the page to set the block "login on AApy" as init , update and run
+            Project.</h5>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_run_login.PNG' %}" alt="">
+        <p>after a few second you should see a popup with your picture and title</p>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_run_login_images.PNG' %}"
+             alt="">
+    </div>
+
+    <div class="bigD"><h5>5. Next step is to configure the block to create a new project</h5>
+        <p>select the other block</p>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_select_bloc_2.PNG' %}"
+             alt="">
+
+        <p>we have 3 step:</p>
+        <ul>
+            <li>Go_to: <a href="{% url 'projects' %}" target="_blank">projects </a> page</li>
+            <li>Input: fill the name of your new project</li>
+            <li>Click: click on create</li>
+            <li>Screenshot: to check if it's done</li>
+        </ul>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_bloc_2_A1.PNG' %}" alt="">
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_bloc_2_A2.PNG' %}" alt="">
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_bloc_2_A3.PNG' %}" alt="">
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_bloc_2_A4.PNG' %}" alt="">
+    </div>
+    <div class="bigD">
+        <h5>6. On the top of the page, select "new project on AApy" as Core Block</h5>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_bloc_2_S1.PNG' %}" alt="">
+
+        <p>update and run Project</p>
+        <img style="width: 80%; margin: 0.75rem auto 2.5rem" src="{% static 'docimg/exemple_bloc_2_D.PNG' %}" alt="">
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
