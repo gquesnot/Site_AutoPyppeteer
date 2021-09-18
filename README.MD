@@ -16,7 +16,7 @@ if you want to use googlesheet Datas
 
 
 ### TODO
-- add Data to  Documenation Exemple
+- add Data to  Documenation  and Exemple
 
 ## Download
 See the [releases page](https://github.com/gquesnot/Site_AutoPyppeteer/releases) 
