@@ -18,6 +18,13 @@
 - https://docs.python.org/3/using/unix.html
 
 
+### INSTALLATION ON DOCKER
+
+edit docker-compose.yml to change the exposed port
+```
+docker-compose -f docker-compose.yml up -d
+```
+
 ### Google Spreedsheet
 if you want to use googlesheet Datas
 - create a Google project with Google sheet api
