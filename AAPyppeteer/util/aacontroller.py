@@ -1,3 +1,6 @@
+import os
+from sys import platform
+
 from pyppeteer import launch
 
 from AAPyppeteer.util.autopuppeteer import AutoPuppeteer
@@ -14,7 +17,6 @@ class AAController:
     cookies = []
     allDataOut = []
     linkedToNextDatas = []
-
 
     def __init__(self, project, config=None):
         self.project = project
@@ -89,15 +91,28 @@ class AAController:
         return page
 
     async def startBrowser(self):
-        self.browser = await launch(handleSIGINT=False,
-                                    handleSIGTERM=False,
-                                    handleSIGHUP=False,
-                                    headless=True,
-                                    # executablePath='/usr/bin/google-chrome-stable',
-                                    args=[
-                                        '--no-sandbox',
-                                    ]
-                                    )
+        try:
+            if platform == "linux":
+                self.browser = await launch(handleSIGINT=False,
+                                            handleSIGTERM=False,
+                                            handleSIGHUP=False,
+                                            headless=True,
+                                            executablePath='/usr/bin/google-chrome-stable',
+                                            args=[
+                                                '--no-sandbox',
+                                            ]
+                                            )
+            else:
+                self.browser = await launch(handleSIGINT=False,
+                                            handleSIGTERM=False,
+                                            handleSIGHUP=False,
+                                            headless=True,
+                                            args=[
+                                                '--no-sandbox',
+                                            ]
+                                            )
+        except:
+            print("ERROR OS")
 
     async def closeBrowser(self):
         for page in self.pages:
