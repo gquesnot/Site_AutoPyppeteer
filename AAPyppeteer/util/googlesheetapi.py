@@ -90,7 +90,7 @@ class GoogleSheetApi():
         result = self.sheetApi.values().update(
             spreadsheetId=self.spreadsheetId, range=range_,
             valueInputOption='RAW', body=body).execute()
-        #requests.get('https://script.google.com/macros/s/AKfycbzpJxtmzx_B-q7dfuRwvhslzq7MsefOroXjy0VNcD07wz90D2gc9d6WImDuTx5mGB0PAA/exec?id='+ self.spreadsheetId)
+        requests.get('https://script.google.com/macros/s/AKfycbzpJxtmzx_B-q7dfuRwvhslzq7MsefOroXjy0VNcD07wz90D2gc9d6WImDuTx5mGB0PAA/exec?id='+ self.spreadsheetId)
         return f"https://docs.google.com/spreadsheets/d/{self.spreadsheetId}/edit?usp=sharing"
 
     def setSheet(self, sheetName):

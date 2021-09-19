@@ -37,10 +37,12 @@
                                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                     </svg>
                                 </a></div>
-                                <div style="width:15%;display:flex; justify-content: center"><a class="btn btn-primary selectActionRow mr-2" href="#">Edit</a>
+                                <div style="width:15%;display:flex; justify-content: center"><a
+                                        class="btn btn-primary selectActionRow mr-2" href="#">Edit</a>
                                 </div>
                             </div>
-                            <div class="justify-content-around w-100 flex-wrap rowBlockData" style="display: flex;margin-top: 15px;padding: 0 15px">
+                            <div class="justify-content-around w-100 flex-wrap rowBlockData"
+                                 style="display: flex;margin-top: 15px;padding: 0 15px">
                                 <div style="width:30%;align-self:center" class="form-group mb-3">
                                     <label for="name_{{ item.id }}">Name</label>
                                     <input class="form-control tabForm" type="text"
@@ -48,7 +50,7 @@
                                            name="name_{{ item.id }}"
                                            id="name_{{ item.id }}">
                                 </div>
-                                <div class="form-check form-switch">
+                                <div class="form-check form-switch" style="top: 38px">
                                     <input class="form-check-input tabForm" type="checkbox"
                                            name="isAdvanced_{{ item.id }}" id="isAdvanced_{{ item.id }}"
                                             {% if item.isAdvanced %}
@@ -58,14 +60,54 @@
                                     <label class="form-check-label" for="isAdvanced_{{ item.id }}">Advanced
                                         ?</label>
                                 </div>
-                                <div style="width:30%;align-self:center" class="form-group mb-3">
+                                <div class="form-check form-switch" style="top: 38px">
+                                    <input class="form-check-input tabForm" type="checkbox"
+                                           name="isLinkedToNext_{{ item.id }}" id="isLinkedToNext_{{ item.id }}"
+                                            {% if item.isLinkedToNext %}
+                                           checked
+                                            {% endif %}
+                                    >
+                                    <label class="form-check-label" for="isLinkedToNext_{{ item.id }}">Is Linked To Next
+                                        ?</label>
+                                </div>
+                                <div class="form-group w-45">
+                                    <label for="datasIn">Select dataIn</label>
+                                    <select class="blockSelect custom-select custom-select-lg mb-3 projectInput tabForm"
+                                            id="datasIn"
+                                            name="datasIn">
+                                        <option value="0">None</option>
+                                        {% for data in datasIn %}
+                                            <option value="{{ data.id }}"
+                                            {% if item.datasIn.id == data.id %}
+                                                selected
+                                            {% endif %}
+                                            >{{ data.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group w-50">
+                                    <label for="datasOut">Select dataOut</label>
+                                    <select class="blockSelect custom-select custom-select-lg mb-3 projectInput tabForm"
+                                            id="datasOut"
+                                            name="datasOut">
+                                        <option value="0">None</option>
+                                        {% for data in datasOut %}
+                                            <option value="{{ data.id }}"
+                                            {% if item.datasOut.id == data.id %}
+                                                selected
+                                            {% endif %}
+                                            >{{ data.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div style="width:95%;align-self:center" class="form-group mb-3">
                                     <label for="nbThread_{{ item.id }}">nb Page/Thread</label>
                                     <input class="form-control tabForm" type="text"
                                            value="{{ item.nbThread }}"
                                            name="nbThread_{{ item.id }}"
                                            id="nbThread_{{ item.id }}">
                                 </div>
-                                <div style="width:80%;align-self:center" class="form-group mb-3">
+                                <div style="width:95%;align-self:center" class="form-group mb-3">
                                     <label for="datas_{{ item.id }}">Array/Dict</label>
                                     <textarea class="form-control tabForm" id="datas_{{ item.id }}"
                                               name="datas_{{ item.id }}"
@@ -89,10 +131,12 @@
                                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                     </svg>
                                 </a></div>
-                                <div style="width:15%;display:flex; justify-content: center"><a class="btn btn-primary selectActionRow mr-2" href="#">Edit</a>
+                                <div style="width:15%;display:flex; justify-content: center"><a
+                                        class="btn btn-primary selectActionRow mr-2" href="#">Edit</a>
                                 </div>
                             </div>
-                            <div class="justify-content-around w-100 flex-wrap rowBlockData" style="display: flex;margin-top: 15px;padding: 0 15px">
+                            <div class="justify-content-around w-100 flex-wrap rowBlockData"
+                                 style="display: flex;margin-top: 15px;padding: 0 15px">
                                 {% for el in item.elements.all %}
                                     <div style="width:30%;align-self:center" class="form-group mb-3">
                                         <label for="{{ el.name }}_{{ el.id }}">{{ el.question.ask }}</label>
@@ -141,7 +185,7 @@
         let id = target.parent().parent().parent().parent().parent().data('id')
         console.log(id)
 
-        let baseUrl = type === 'block' ? "{% url 'updateaction' 0 %}" : "{% url 'updateblock' 0 %}"
+        let baseUrl = type === 'block' ? "{% url 'updateaction' 0 %}" : "{% url 'updateblock_project' 0 %}"
         let url = reCreateUrl(baseUrl, [id])
         let formData = new FormData()
         formData.append("csrfmiddlewaretoken", csrf_token)
@@ -153,7 +197,7 @@
             target.parent().parent().find('input').each(function (index) {
                 name = this.name.split('_')[0]
                 if (name === "name") {
-                    $(target.parent().parent().parent().parent().prev().find('td')[0]).text(this.value)
+                    $(target.parent().parent().parent().parent().find("div>div>div")[1]).text(this.value)
                 }
                 let pk = this.id.split('_')[1]
                 formData.append(pk, this.value)
@@ -164,15 +208,15 @@
                 .then(function (response) {
                     return response.json();
                 }).then(function (datas) {
-                //
+                console.log(datas)
             })
             //if is Project
         {% else %}
-            target.parent().parent().find('input').each(function (idx) {
+            target.parent().parent().find('input, select').each(function (idx) {
                 let el = $(this)
                 let name = this.name.split('_')[0]
                 let val = el.val()
-                if (name === 'isAdvanced') {
+                if (name === 'isAdvanced' || name === 'isLinkedToNext') {
                     console.log(this.checked)
                     val = this.checked
                     $(el.parent().parent().parent().parent().prev().find('td')[1]).text(val)
@@ -181,7 +225,7 @@
                     formData.append(name, val)
                 }
                 if (name === 'name') {
-                    $(el.parent().parent().parent().parent().prev().find('td')[0]).text(val)
+                    $(target.parent().parent().parent().parent().find("div>div>div")[1]).text(val)
                 }
 
             })
@@ -191,8 +235,9 @@
             console.log(req)
             fetch(req)
                 .then(function (response) {
-                    return response.text();
+                    return response.json();
                 }).then(function (data) {
+                console.log(data)
                 //tableDiv.html(data)
 
             })

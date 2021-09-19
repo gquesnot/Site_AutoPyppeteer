@@ -4,19 +4,44 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
 
-from AAPyppeteer.models import BlockConfigured, Block, Project, BaseAction
+from AAPyppeteer.models import BlockConfigured, Block, Project, BaseAction, Action
 
 
-def updateBlock(request, blockPk):
+def updateActionOrder(request, blockPk):
+    newOrder = json.loads(request.POST['datas'])
+    block = Block.objects.get(pk=blockPk)
 
-    blockC = BlockConfigured.objects.get(pk=blockPk)
-    blockC.isAdvanced = request.POST['isAdvanced'] == "true"
-    blockC.nbThread = int(request.POST['nbThread']) if request.POST['nbThread'] else 0
-    blockC.datas = json.loads(request.POST['datas'])
-    #blockC.type = json.loads(request.POST['type'])
-    blockC.save()
-    return JsonResponse(blockC.getDict(), safe=False)
 
+    for el in newOrder:
+        id_ = el['id']
+        pos = el['position']
+
+        for action in block.elements.all():
+            if id_ == action.id and pos != action.position:
+                action.position = pos
+                action.save()
+
+    return JsonResponse(block.getDict(), safe=False)
+
+def updateActionBlock(request, actionPk):
+    action = Action.objects.get(pk=actionPk)
+    answers = action.elements.all()
+
+    for answer in answers:
+        for k ,v in request.POST.items():
+
+            if k == "csrfmiddlewaretoken":
+                continue
+            else:
+
+                if k == str(answer.pk):
+                    print(answer.pk, k, v)
+                    if answer.name == "name":
+                        action.name = v
+                    answer.value = v
+                    answer.save()
+    action.save()
+    return JsonResponse(action.getDict(), safe=False)
 
 def addBlock(request):
     block = Block(name=request.POST['name'], user_id=request.user, type=request.POST['type'])

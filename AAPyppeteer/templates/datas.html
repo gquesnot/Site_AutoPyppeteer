@@ -12,12 +12,6 @@
             <div style="width: 47.5%;">
                 <form class="mb-3" method="post">
                     {% csrf_token %}
-
-                    <div class="form-group mb-3">
-                        <label for="newDataName">New Datas</label>
-                        <input class="form-control" id="newDataName" name="new_block_name" type="text">
-
-                    </div>
                     <div class="form-group">
                         <label for="dataType">Select Type</label>
                         <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" name="blockType"
@@ -28,6 +22,12 @@
 
                         </select>
                     </div>
+                    <div class="form-group mb-3">
+                        <label for="newDataName">New Datas Name</label>
+                        <input class="form-control" id="newDataName" name="new_block_name" type="text">
+
+                    </div>
+
                     <div id="dataTypeHide">
                         {% for dataType in dataTypes %}
                             <div class="parentData"
@@ -44,15 +44,17 @@
                                                    name="{{ k }}_{{ dataType.pk }}">
                                         {% elif v.type == "file" %}
                                             <div class="custom-file d-flex" style="top:15px">
-                                                <input name="{{ k }}_{{ dataType.pk }}" type="file" class="custom-file-input" id="{{ k }}_{{ dataType.pk }}">
-                                                <label class="custom-file-label" for="{{ k }}_{{ dataType.pk }}">Choose file</label>
+                                                <input name="{{ k }}_{{ dataType.pk }}" type="file"
+                                                       class="custom-file-input" id="{{ k }}_{{ dataType.pk }}">
+                                                <label class="custom-file-label" for="{{ k }}_{{ dataType.pk }}">Choose
+                                                    file</label>
                                             </div>
                                         {% endif %}
 
                                     </div>
 
                                 {% endfor %}
-                                    <button class="btn btn-success mt-5 w-50 newData">Create</button>
+                                <button class="btn btn-success mt-5 w-50 newData">Create</button>
                             </div>
 
                         {% endfor %}
@@ -71,8 +73,38 @@
                     </select>
 
                 </div>
+
                 <button class="btn btn-danger" id="btnDelData">delete</button>
+            <div id="datasContent">
+                {% for data in dataBlocks %}
+                    <div style="display:flex" class=" justify-content-around flex-wrap" data-id="{{ data.pk }}">
+                    {% for k, v in data.datas.items %}
+                        <div style="width:45%;align-self:center" class="form-group mb-3">
+                            {% if v.type == "input" %}
+                                <label class="form-label"
+                                       for="{{ k }}_{{ data.pk }}">{{ v.ask }}</label>
+
+                                <input class="form-control tabForm" data-id="{{ data.pk }}" type="text"
+                                       id="{{ k }}_{{ data.pk }}" value="{{ v.value }}"
+                                       name="{{ k }}_{{ data.pk }}">
+                            {% elif v.type == "file" %}
+                                <div class="custom-file d-flex" style="top:15px">
+                                    <input name="{{ k }}_{{ data.pk }}" type="file"
+                                           class="custom-file-input tabForm" id="{{ k }}_{{ data.pk }}">
+                                    <label class="custom-file-label" for="{{ k }}_{{ data.pk }}">Choose
+                                        file</label>
+                                </div>
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+                    </div>
+
+
+                {% endfor %}
             </div>
+            </div>
+
         </div>
     </div>
 {% endblock %}
@@ -87,40 +119,38 @@
         var dataType = $('#dataType')
         var dataTypeHide = $('div.parentData')
         var parentData = $('.parentData')
-
+        var datasContent = $('#datasContent>div')
+        var allInput = $('#datasContent .tabForm')
 
         var addblockUrl = "{% url 'adddata' %}"
 
         dataTypeHide.hide()
-
+        datasContent.hide()
         function loadData() {
             dataId = dataType[0].options[dataType[0].options.selectedIndex].value
-            dataTypeHide.each(function(idx){
-                if ($(this).data('id').toString() === dataId){
+            dataTypeHide.each(function (idx) {
+                if ($(this).data('id').toString() === dataId) {
                     $(this).show()
-                }
-                else{
+                } else {
                     $(this).hide()
                 }
             })
         }
 
-        if (dataType[0].options.length> 0){
+        if (dataType[0].options.length > 0) {
             loadData()
         }
 
-        dataType.change(function(e){
+        dataType.change(function (e) {
             e.preventDefault()
             loadData()
         })
 
 
-
-
         if (confData[0].options.length > 0) {
 
             dataId = confData[0].options[confData[0].options.selectedIndex].value
-            console.log(dataId)
+            loadInputData()
 
         }
 
@@ -137,13 +167,58 @@
         confData.change(function (e) {
             e.preventDefault()
             dataId = this.options[this.options.selectedIndex].value
-            loadInputData(dataId)
+            loadInputData()
 
 
         })
 
-        function loadInputData(dataId) {
-            console.log(dataId)
+        allInput.on('focusout', function (e) {
+        e.preventDefault()
+        updateData($(this))
+    })
+        function updateData(target){
+
+            let baseUrl = '{% url 'updatedata' 0 %}'
+             let url = reCreateUrl(baseUrl, [dataId])
+            let formData = new FormData()
+            formData.append("csrfmiddlewaretoken", csrf_token)
+            res = {}
+            target.parent().parent().find('input').each(function (index){
+                let el = $(this)
+                let name  = this.id.split('_')[0]
+                if (name !== "file"){
+
+                    res[name] = $(this).val()
+
+                }
+                else{
+                    if (this.files.length > 0){
+                        formData.append("fileData", this.files[0], this.files[0].name)
+                    }
+
+                }
+            })
+            formData.append("datas", JSON.stringify(res))
+            let req = new Request(url, {method: 'POST', body: formData})
+
+            console.log(req)
+            fetch(req)
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                console.log(data)
+
+            })
+        }
+
+        function loadInputData() {
+            datasContent.hide()
+            datasContent.each( function (e){
+                let el = $(this)
+                if (el.data("id") === parseInt(dataId)){
+                    el.show()
+                }
+            })
         }
 
 
@@ -154,13 +229,12 @@
             console.log($(target).parent().data('id'))
             let res = {}
             let file = null
-            $(target).parent().find('input').each(function (index){
+            $(target).parent().find('input').each(function (index) {
                 let name = this.id.split('_')[0]
-                if (name !== "file"){
+                if (name !== "file") {
                     res[name] = $(this).val()
-                }
-                else{
-                    file = {'data':this.files[0], "name": this.files[0].name}
+                } else {
+                    file = {'data': this.files[0], "name": this.files[0].name}
                 }
 
 
@@ -173,17 +247,18 @@
             formData.append("csrfmiddlewaretoken", csrf_token)
             formData.append("datas", JSON.stringify(res))
             console.log(JSON.stringify(res))
-            if (file !== null){
-                formData.append("fileData",file['data'], file['name'])
+            if (file !== null) {
+                formData.append("fileData", file['data'], file['name'])
             }
 
 
-            const request = new Request(url, {method: 'POST', body: formData, contentType:false, processData:false})
+            const request = new Request(url, {method: 'POST', body: formData, contentType: false, processData: false})
             fetch(request)
                 .then(function (response) {
                     return response.json();
                 }).then(function (data) {
-                    console.log(data)
+                console.log(data)
+                location.reload();
                 //new option
                 {#let o = new Option(data.name, data.id);#}
                 {#confData.append(o)#}

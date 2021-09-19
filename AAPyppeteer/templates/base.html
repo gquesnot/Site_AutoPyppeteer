@@ -44,25 +44,28 @@
                 var el = document.getElementById('items')
                 var sortable = new Sortable(el, {
                     onUpdate: function (/**Event*/evt) {
-                        let baseUrl = "{% url 'updateactionorder'  0 %}"
-                        let url = reCreateUrl(baseUrl, [dataId])
-                        console.log(url)
+                        if (blockId !== undefined) {
+                            let baseUrl = "{% url 'updateactionorder'  0 %}"
+                            let url = reCreateUrl(baseUrl, [blockId])
+                            console.log(url)
 
-                        let formData = new FormData()
-                        formData.append("csrfmiddlewaretoken", csrf_token)
-                        let datas = []
-                        $('#items tr').each(function (idx) {
-                            console.log(this)
-                            datas.push({id: $(this).data('id'), position: idx})
-                        })
-                        formData.append("datas", JSON.stringify(datas))
-                        var request = new Request(url, {method: 'POST', body: formData})
-                        fetch(request)
-                            .then(function (response) {
-                                return response.text();
-                            }).then(function (datas) {
+                            let formData = new FormData()
+                            formData.append("csrfmiddlewaretoken", csrf_token)
+                            let datas = []
+                            $('#items tr').each(function (idx) {
+                                console.log(this)
+                                datas.push({id: $(this).data('id'), position: idx})
+                            })
+                            formData.append("datas", JSON.stringify(datas))
+                            var request = new Request(url, {method: 'POST', body: formData})
+                            fetch(request)
+                                .then(function (response) {
+                                    return response.text();
+                                }).then(function (datas) {
 
-                        })
+                            })
+                        }
+
 
                     }
                 });

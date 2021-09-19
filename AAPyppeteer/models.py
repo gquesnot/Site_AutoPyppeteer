@@ -105,6 +105,7 @@ class DataBlockType(models.Model):
     datas = models.JSONField(default=dict)
     requireFile = models.BooleanField(default=False)
     io = models.CharField(max_length=200, default="in")
+    value = models.CharField(max_length=200, default="")
 
 
     def all(self):
@@ -112,7 +113,7 @@ class DataBlockType(models.Model):
         return self
 
     def getDict(self):
-        return {"name": self.name, "datas": self.datas, "requireFile": str(self.requireFile), "io": self.io}
+        return {"name": self.name, "datas": self.datas, "requireFile": str(self.requireFile), "io": self.io, "value": self.value}
 
 
 class DataBlock(models.Model):

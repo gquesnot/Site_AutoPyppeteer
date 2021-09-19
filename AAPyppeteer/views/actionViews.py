@@ -5,25 +5,7 @@ from django.http import JsonResponse
 from AAPyppeteer.models import Action, Block, BaseAction, Question, Answer
 
 
-def updateAction(request, actionPk):
-    action = Action.objects.get(pk=actionPk)
-    answers = action.elements.all()
 
-    for answer in answers:
-        for k ,v in request.POST.items():
-
-            if k == "csrfmiddlewaretoken":
-                continue
-            else:
-
-                if k == str(answer.pk):
-                    print(answer.pk, k, v)
-                    if answer.name == "name":
-                        action.name = v
-                    answer.value = v
-                    answer.save()
-    action.save()
-    return JsonResponse(action.getDict(), safe=False)
 
 
 def addAction(request, blockPk, baseActionPk):
@@ -58,18 +40,3 @@ def deleteAction(request, blockPk, actionPk):
     return JsonResponse(block.getDict(), safe=False)
 
 
-def updateActionOrder(request, blockPk):
-    newOrder = json.loads(request.POST['datas'])
-    block = Block.objects.get(pk=blockPk)
-
-
-    for el in newOrder:
-        id_ = el['id']
-        pos = el['position']
-
-        for action in block.elements.all():
-            if id_ == action.id and pos != action.position:
-                action.position = pos
-                action.save()
-
-    return JsonResponse(block.getDict(), safe=False)

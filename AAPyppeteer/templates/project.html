@@ -13,7 +13,7 @@
         <div class="d-flex flex-column" style="width: 47.5%;">
             <h3 class="mt-3 mb-2">Project Blocks</h3>
             <div id="divUpperTable">
-                {% include 'tab.html' with items=project.blocks.all type='project' %}
+                {% include 'tab.html' with items=project.blocks.all type='project' datasIn=datasIn datasOut=datasOut %}
             </div>
 
 
@@ -23,7 +23,8 @@
             <h3 class="mb-2 mt-3">Add a Block</h3>
             <div class="form-group">
                 <label for="blockConfig">Select a block</label>
-                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="blockConfig" name="blockConfig">
+                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="blockConfig"
+                        name="blockConfig">
 
                     {% for block in blocks %}
                         <option value="{{ block.id }}">{{ block.name }}</option>
@@ -37,26 +38,27 @@
             </div>
 
 
-
             <div class="form-group">
                 <label for="dataInConfig">Select dataIn</label>
-                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="dataInConfig" name="dataInConfig">
+                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="dataInConfig"
+                        name="dataInConfig">
                     <option value="0">None</option>
                     {% for data in datasIn %}
                         <option value="{{ data.id }}">{{ data.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-        <div class="form-group">
+            <div class="form-group">
                 <label for="dataOutConfig">Select dataOut</label>
-                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="dataOutConfig" name="dataOutConfig">
+                <select class="blockSelect custom-select custom-select-lg mb-3 projectInput" id="dataOutConfig"
+                        name="dataOutConfig">
                     <option value="0">None</option>
                     {% for data in datasOut %}
                         <option value="{{ data.id }}">{{ data.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-        <div class="form-check form-switch">
+            <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="isLinkedToNext">
                 <label class="form-check-label" for="isLinkedToNext">is outpout linked to next block ?</label>
             </div>
@@ -112,9 +114,9 @@
         var dataOutConfig = $('#dataOutConfig')
         var isLinkedToNext = $('#isLinkedToNext')
 
-        runProjectBtn.after("<div style=\"position: relative;top:2px;left:20px\" class=\"spinner-border text-success\" role=\"status\">"+
-        "<span  class=\"sr-only\">Loading...</span>"+
-        "</div>")
+        runProjectBtn.after("<div style=\"position: relative;top:2px;left:20px\" class=\"spinner-border text-success\" role=\"status\">" +
+            "<span  class=\"sr-only\">Loading...</span>" +
+            "</div>")
         runProjectBtn.next().hide()
         isAdvancedInput.click(function () {
             $('#nbPage').prop('disabled', function (i, v) {
@@ -167,8 +169,8 @@
             formData.append("isAdvanced", isAdvancedInput[0].checked)
             formData.append("isLinkedToNext", isLinkedToNext[0].checked)
             formData.append("datas", datas)
-            formData.append("datasIn",dataInConfig[0].options[dataInConfig[0].selectedIndex].value)
-            formData.append("datasOut",dataOutConfig[0].options[dataOutConfig[0].selectedIndex].value)
+            formData.append("datasIn", dataInConfig[0].options[dataInConfig[0].selectedIndex].value)
+            formData.append("datasOut", dataOutConfig[0].options[dataOutConfig[0].selectedIndex].value)
 
 
             const request = new Request(url, {method: 'POST', body: formData})
