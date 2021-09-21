@@ -4,8 +4,8 @@
 
 ```
     python3 -m pip install --upgrade pip
-    python3 -m venv .env
-    .\.env\Scripts\activate.bat
+    python3 -m venv .env2
+    .\.env2\Scripts\activate.bat
     pip install -r requirements.txt
     python manage.py runserver
 ```
@@ -26,12 +26,7 @@ docker-compose -f docker-compose.yml up -d
 ```
 
 ### Google Spreedsheet
-if you want to use googlesheet Datas
-- create a Google project with Google sheet api
-- create an Auth2 with url http://localhost/ if local or your url
-- rename and store your Auth2 credentials.json  in this path AAPyppeteer/util/credentials.json
-- the first time you run a project with a Google spreadsheet a pop-up will open to access the application
-- login in 
+See [installation](https://github.com/gquesnot/Site_AutoPyppeteer/INSTALL_GOOGLE_API/INSTALL.MD)
 
 
 ### TODO

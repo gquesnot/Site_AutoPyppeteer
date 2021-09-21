@@ -26,8 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
-    "13.36.178.92",
-    "django.next-level.xyz",
     "localhost",
 ]
 # SECURE_HSTS_SECONDS=True

@@ -213,7 +213,7 @@ class AutoPuppeteer:
             action = await self.getJsContent(action, page)
         elif toDo in ("get jquery value", "exec jquery"):
             action = await self.getJqueryContent(action, page)
-        page.waitForNavigation()
+        #await page.waitForNavigation()
         return action
         # await self.applyWait(action, nextConfig)
 

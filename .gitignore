@@ -6,3 +6,4 @@ db.sqlite3
 /static/filesOut
 __pycache__
 util/__pycache__
+/AAPyppeteer/util/service_account.json

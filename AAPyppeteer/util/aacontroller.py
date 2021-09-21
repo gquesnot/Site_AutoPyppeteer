@@ -17,6 +17,7 @@ class AAController:
     cookies = []
     allDataOut = []
     linkedToNextDatas = []
+    googleApi = None
 
     def __init__(self, project, config=None):
         self.project = project
@@ -56,8 +57,7 @@ class AAController:
 
         return self.globalDatas, self.allDataOut, self.imgs
 
-    @staticmethod
-    def processDatasIn(block):
+    def processDatasIn(self,block):
         if block['datasIn'] is not None:
             datasInC = block['datasIn']
 
@@ -72,6 +72,7 @@ class AAController:
         return None
 
     def processDatasOut(self, block, datasOut):
+
         if datasOut is not None and block['datasOut'] is not None:
             datasOutC = block['datasOut']
             if datasOutC['name'] == "Excel":
@@ -79,8 +80,12 @@ class AAController:
                 path = ex.insertValues(datasOut)
                 self.allDataOut.append({"url": path, "type": "other", "name": block['name']})
             elif datasOutC['name'] == "Google Spreadsheet":
+                print("pass here")
                 gs = GoogleSheetApi()
+                print("pass next")
                 path = gs.insertValues(datasOut)
+                print("done")
+                print(path)
                 self.allDataOut.append({"url": path, "type": "static", "name": block['name']})
         return datasOut if block['isLinkedToNext'] else []
 
@@ -96,6 +101,7 @@ class AAController:
                 self.browser = await launch(handleSIGINT=False,
                                             handleSIGTERM=False,
                                             handleSIGHUP=False,
+                                            handleSIGPIPE=True,
                                             headless=True,
                                             executablePath='/usr/bin/google-chrome-stable',
                                             args=[
@@ -106,6 +112,7 @@ class AAController:
                 self.browser = await launch(handleSIGINT=False,
                                             handleSIGTERM=False,
                                             handleSIGHUP=False,
+                                            handleSIGPIPE=True,
                                             headless=True,
                                             args=[
                                                 '--no-sandbox',
