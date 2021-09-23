@@ -31,11 +31,12 @@
                     <div id="dataTypeHide">
                         {% for dataType in dataTypes %}
                             <div class="parentData"
-                                 style="display: flex; justify-content:space-around;flex-wrap: wrap"
+                                 style="display: flex; justify-content: space-between;flex-wrap: wrap"
                                  data-id="{{ dataType.pk }}">
                                 {% for k, v in dataType.datas.items %}
-                                    <div style="width:45%;align-self:center" class="form-group mb-3">
+
                                         {% if v.type == "input" %}
+                                            <div style="width:45%;align-self:center" class="form-group mb-3">
                                             <label class="form-label"
                                                    for="{{ k }}_{{ dataType.pk }}">{{ v.ask }}</label>
 
@@ -43,18 +44,28 @@
                                                    id="{{ k }}_{{ dataType.pk }}" value=""
                                                    name="{{ k }}_{{ dataType.pk }}">
                                         {% elif v.type == "file" %}
+                                            <div style="width:45%;align-self:center" class="form-group mb-3">
                                             <div class="custom-file d-flex" style="top:15px">
                                                 <input name="{{ k }}_{{ dataType.pk }}" type="file"
                                                        class="custom-file-input" id="{{ k }}_{{ dataType.pk }}">
                                                 <label class="custom-file-label" for="{{ k }}_{{ dataType.pk }}">Choose
                                                     file</label>
                                             </div>
+                                        {% elif v.type == "textarea" %}
+                                            <div style="width:100%;align-self:center" class="form-group mb-3">
+                                        <label  for="{{ k }}_{{ data.pk }}">{{ v.ask }}</label>
+                                            <textarea name="{{ k }}_{{ data.pk }}"
+                                                   class="form-control tabForm  w-100" style="min-height:125px" id="{{ k }}_{{ data.pk }}"></textarea>
+
                                         {% endif %}
 
                                     </div>
 
                                 {% endfor %}
-                                <button class="btn btn-success mt-5 w-50 newData">Create</button>
+                                <div class="w-100 d-flex justify-content-center">
+                                    <button class="btn btn-success mt-5 w-50 newData">Create</button>
+                                </div>
+
                             </div>
 
                         {% endfor %}
@@ -75,34 +86,47 @@
                 </div>
 
                 <button class="btn btn-danger" id="btnDelData">delete</button>
-            <div id="datasContent">
-                {% for data in dataBlocks %}
-                    <div style="display:flex" class=" justify-content-around flex-wrap" data-id="{{ data.pk }}">
-                    {% for k, v in data.datas.items %}
-                        <div style="width:45%;align-self:center" class="form-group mb-3">
-                            {% if v.type == "input" %}
-                                <label class="form-label"
-                                       for="{{ k }}_{{ data.pk }}">{{ v.ask }}</label>
+                <div id="datasContent">
+                    {% for data in dataBlocks %}
 
-                                <input class="form-control tabForm" data-id="{{ data.pk }}" type="text"
-                                       id="{{ k }}_{{ data.pk }}" value="{{ v.value }}"
-                                       name="{{ k }}_{{ data.pk }}">
-                            {% elif v.type == "file" %}
-                                <div class="custom-file d-flex" style="top:15px">
-                                    <input name="{{ k }}_{{ data.pk }}" type="file"
-                                           class="custom-file-input tabForm" id="{{ k }}_{{ data.pk }}">
-                                    <label class="custom-file-label" for="{{ k }}_{{ data.pk }}">Choose
-                                        file</label>
+                        <div style="display:flex" class=" justify-content-between flex-wrap" data-id="{{ data.pk }}">
+                            <div class="w-100 d-flex justify-content-center">
+                                <h5>Type: {{ data.type.name }}</h5>
+                            </div>
+                            {% for k, v in data.datas.items %}
+
+
+                                    {% if v.type == "input" %}
+                                         <div style="width:45%;align-self:center" class="form-group mb-3">
+                                        <label class="form-label"
+                                               for="{{ k }}_{{ data.pk }}">{{ v.ask }}</label>
+
+                                        <input class="form-control tabForm" data-id="{{ data.pk }}" type="text"
+                                               id="{{ k }}_{{ data.pk }}" value="{{ v.value }}"
+                                               name="{{ k }}_{{ data.pk }}">
+                                    {% elif v.type == "file" %}
+                                         <div style="width:45%;align-self:center" class="form-group mb-3">
+                                        <div class="custom-file d-flex" style="top:15px">
+                                            <input name="{{ k }}_{{ data.pk }}" type="file"
+                                                   class="custom-file-input tabForm" id="{{ k }}_{{ data.pk }}">
+                                            <label class="custom-file-label" for="{{ k }}_{{ data.pk }}">Choose
+                                                file</label>
+                                        </div>
+                                    {% elif v.type == "textarea" %}
+                                            <div style="width:100%;align-self:center" class="form-group mb-3">
+                                        <label  for="{{ k }}_{{ data.pk }}">{{ v.ask }}</label>
+                                            <textarea name="{{ k }}_{{ data.pk }}"
+                                                   class="form-control tabForm  w-100" style="min-height:125px" id="{{ k }}_{{ data.pk }}"></textarea>
+
+                                    {% endif %}
+
                                 </div>
-                            {% endif %}
-
+                            {% endfor %}
                         </div>
+
+
                     {% endfor %}
-                    </div>
-
-
-                {% endfor %}
-            </div>
+                </div>
             </div>
 
         </div>
@@ -121,21 +145,20 @@
         var parentData = $('.parentData')
         var datasContent = $('#datasContent>div')
         var allInput = $('#datasContent .tabForm')
+        var deleteBtn = $('#btnDelData')
 
         var addblockUrl = "{% url 'adddata' %}"
 
         dataTypeHide.hide()
         datasContent.hide()
-        function loadData() {
-            dataId = dataType[0].options[dataType[0].options.selectedIndex].value
-            dataTypeHide.each(function (idx) {
-                if ($(this).data('id').toString() === dataId) {
-                    $(this).show()
-                } else {
-                    $(this).hide()
-                }
-            })
-        }
+
+        deleteBtn.click(function (e) {
+            e.preventDefault()
+            deleteData()
+
+
+        })
+
 
         if (dataType[0].options.length > 0) {
             loadData()
@@ -173,26 +196,62 @@
         })
 
         allInput.on('focusout', function (e) {
-        e.preventDefault()
-        updateData($(this))
-    })
-        function updateData(target){
+            e.preventDefault()
+            updateData($(this))
+        })
 
-            let baseUrl = '{% url 'updatedata' 0 %}'
-             let url = reCreateUrl(baseUrl, [dataId])
+        function deleteData() {
+            dataId = confData[0].options[confData[0].options.selectedIndex].value
+            let baseUrl = '{% url 'deletedata' 0 %}'
+            let url = reCreateUrl(baseUrl, [dataId])
             let formData = new FormData()
             formData.append("csrfmiddlewaretoken", csrf_token)
-            res = {}
-            target.parent().parent().find('input').each(function (index){
+
+            let req = new Request(url, {method: 'POST', body: formData})
+
+            console.log(req)
+            fetch(req)
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                console.log(data)
+                confData.children().each(function (idx){
+                    if (this.value === dataId){
+                        $(this).remove();
+                    }
+                })
+
+            })
+        }
+
+        function loadData() {
+            dataId = dataType[0].options[dataType[0].options.selectedIndex].value
+            dataTypeHide.each(function (idx) {
+                if ($(this).data('id').toString() === dataId) {
+                    $(this).show()
+                } else {
+                    $(this).hide()
+                }
+            })
+        }
+
+        function updateData(target) {
+
+            let baseUrl = '{% url 'updatedata' 0 %}'
+            let url = reCreateUrl(baseUrl, [dataId])
+            let formData = new FormData()
+            formData.append("csrfmiddlewaretoken", csrf_token)
+            let res = {}
+            target.parent().parent().find('input').each(function (index) {
                 let el = $(this)
-                let name  = this.id.split('_')[0]
-                if (name !== "file"){
+                let name = this.id.split('_')[0]
+                if (name !== "file") {
 
                     res[name] = $(this).val()
+                    this.value = ""
 
-                }
-                else{
-                    if (this.files.length > 0){
+                } else {
+                    if (this.files.length > 0) {
                         formData.append("fileData", this.files[0], this.files[0].name)
                     }
 
@@ -213,9 +272,9 @@
 
         function loadInputData() {
             datasContent.hide()
-            datasContent.each( function (e){
+            datasContent.each(function (e) {
                 let el = $(this)
-                if (el.data("id") === parseInt(dataId)){
+                if (el.data("id") === parseInt(dataId)) {
                     el.show()
                 }
             })

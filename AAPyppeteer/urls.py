@@ -42,6 +42,7 @@ urlpatterns = [
     path('datas', datasViews.datasBlockView, name='datas'),
     path('updatedata/<int:dataPk>', datasViews.updateData, name='updatedata'),
     path('adddata', datasViews.addData, name='adddata'),
+    path('deletedata/<int:dataPk>', datasViews.deleteData, name='deletedata'),
 
 # other
     path('documentation', views.documentation, name='documentation'),

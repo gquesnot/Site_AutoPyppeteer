@@ -44,7 +44,7 @@ def updateActionBlock(request, actionPk):
     return JsonResponse(action.getDict(), safe=False)
 
 def addBlock(request):
-    block = Block(name=request.POST['name'], user_id=request.user, type=request.POST['type'])
+    block = Block(name=request.POST['name'], user_id=request.user)
     block.save()
     return JsonResponse(block.getDict(), safe=False)
 

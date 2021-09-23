@@ -74,3 +74,11 @@ def checkAndDataFile(request):
         path = static(path)
         print(path)
     return path
+
+
+def deleteData(request, dataPk):
+
+    data = DataBlock.objects.get(pk=dataPk)
+    if data.user_id == request.user.id:
+        data.delete()
+    return JsonResponse({"message":"done"}, safe=False)

@@ -1,5 +1,6 @@
 # SITE AUTOPUPPETEER
 
+
 ## INSTALLATION ON WINDOWS
 
 ```
@@ -24,6 +25,11 @@ edit docker-compose.yml to change the exposed port
 ```
 docker-compose -f docker-compose.yml up -d
 ```
+
+### Auth
+- username: admin
+- password: password
+
 
 ### Google Spreedsheet
 See [installation](https://github.com/gquesnot/Site_AutoPyppeteer/blob/master/INSTALL_GOOGLE_API/INSTALL.MD)

@@ -75,7 +75,6 @@ class Action(models.Model):
 class Block(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
-    type = models.CharField(max_length=200)
     elements = models.ManyToManyField(Action)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -83,7 +82,6 @@ class Block(models.Model):
         res = {
             "id": self.pk,
             "name": self.name,
-            "type": self.type,
             "description": self.description,
             "elements": [action.getDict() for action in self.elements.all().order_by('position')],
             "user_id": self.user_id.pk
@@ -142,7 +140,7 @@ class BlockConfigured(models.Model):
     name = models.CharField(max_length=200)
     isAdvanced = models.BooleanField(default=False)
     datasIn = models.ForeignKey(DataBlock, on_delete=models.CASCADE, blank=True, null=True, related_name="datasIn")
-    datasOut = models.ForeignKey(DataBlockType, on_delete=models.CASCADE, blank=True, null=True, related_name="datasOut")
+    datasOut = models.ForeignKey(DataBlock, on_delete=models.CASCADE, blank=True, null=True, related_name="datasOut")
     block = models.ForeignKey(Block, on_delete=models.CASCADE, blank=True, null=True)
     nbThread = models.IntegerField(default=0)
     datas = models.JSONField(default=dict)

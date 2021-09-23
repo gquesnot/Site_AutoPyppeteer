@@ -5,10 +5,10 @@
 
 <div>
     {% for k in data %}
-        {% if k.type == 'static' %}
-            <div> DataOut for Google Sheet BlockName:  <a href="{{ k.url }}"> {{ k.name }}</a></div>
+        {% if k.type == 'normal' %}
+            <div> {{ k.blockType }} BlockName:  <a href="{{ k.url }}"> {{ k.name }}</a></div>
         {% else %}
-            <div> DataOut for Excel BlockName:<a href="{{ k.url }}">{{ k.name }}</a></div>
+            <div>{{ k.blockType }} BlockName:<a href="{{ k.url }}" download>{{ k.name }}</a></div>
         {% endif %}
 
     {% endfor %}

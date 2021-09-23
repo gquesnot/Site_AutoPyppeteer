@@ -15,8 +15,8 @@ from AAPyppeteer.views.views import ProjectsView
 
 def getBlocksProject(request, projectPk):
     project = Project.objects.get(pk=projectPk)
-    datasOut = DataBlockType.objects.all()
-    datasIn = DataBlock.objects.filter(user_id=request.user.id)
+    datasOut = DataBlock.objects.filter(user_id=request.user.id, type__io="out")
+    datasIn = DataBlock.objects.filter(user_id=request.user.id, type__io="in")
     return render(request, "../templates/tab.html", {
         "type": "project",
         "items": project.blocks.all(),
@@ -30,8 +30,8 @@ class ProjectView(View):
     def get(self, request, pk):
         blocks = Block.objects.filter(user_id=request.user.id)
         project = Project.objects.get(pk=pk)
-        datasOut = DataBlockType.objects.all()
-        datasIn = DataBlock.objects.filter(user_id=request.user.id)
+        datasOut = DataBlock.objects.filter(user_id=request.user.id, type__io="out")
+        datasIn = DataBlock.objects.filter(user_id=request.user.id, type__io="in")
         return render(request, "../templates/project.html", {
             "blocks": blocks,
             "project": project,
@@ -58,7 +58,6 @@ def runProject(request, projectPk):
             "datas": block['datas'],
             "datasIn": block['datasIn'],
             "datasOut": block['datasOut'],
-            "type": block['block']['type'],
             "actions": [],
             "id": block['id']
         }
@@ -75,7 +74,8 @@ def runProject(request, projectPk):
     # print(json.dumps(res, indent=4))
 
     projectDict['blocks'] = newBlocks
-    # print(json.dumps(projectDict, indent=4))
+    #print(json.dumps(projectDict, indent=4))
+
     aa = AAController(projectDict)
     datas, datasOut, imgs = asyncio.run(aa.runAll())
     print("DATAS:\n", datas, "\nIMG:\n", imgs, "\nDATASOUT: \n", datasOut)
@@ -113,7 +113,7 @@ def updateBlockProject(request, blockPk):
     blockC.isLinkedToNext = request.POST['isLinkedToNext'] == "true"
     blockC.nbThread = int(request.POST['nbThread']) if request.POST['nbThread'] else 0
     blockC.datasIn = DataBlock.objects.get(pk=int(request.POST['datasIn'])) if request.POST['datasIn'] != "0" else None
-    blockC.datasOut = DataBlockType.objects.get(pk=int(request.POST['datasOut'])) if request.POST['datasOut'] != "0" else None
+    blockC.datasOut = DataBlock.objects.get(pk=int(request.POST['datasOut'])) if request.POST['datasOut'] != "0" else None
     blockC.datas = json.loads(request.POST['datas'])
     # blockC.type = json.loads(request.POST['type'])
     blockC.save()
@@ -158,7 +158,7 @@ def addBlockToProject(request, projectPk):
     if datasOutId == 0:
         datasOut = None
     else:
-        datasOut = DataBlockType.objects.get(pk=datasOutId)
+        datasOut = DataBlock.objects.get(pk=datasOutId)
 
     newBlockC = BlockConfigured(name=request.POST['name'], block=block, nbThread=nbThread, datas=datas,
                                 isAdvanced=isAdvanced, datasIn=datasIn, datasOut=datasOut,
@@ -166,9 +166,12 @@ def addBlockToProject(request, projectPk):
     newBlockC.save()
     project.blocks.add(newBlockC)
     project.save()
+    datasIn = DataBlock.objects.filter()
     return render(request, "../templates/tab.html", {
         "type": "project",
-        "items": project.blocks.all()
+        "items": project.blocks.all(),
+        "datasOut":DataBlock.objects.filter(user_id=request.user.id, type__io="out"),
+    "datasIn" :DataBlock.objects.filter(user_id=request.user.id, type__io="in"),
     })
 
 
@@ -178,4 +181,5 @@ def deleteBlockProject(request, projectPk, blockPk):
     project.blocks.remove(block)
     project.save()
     block.delete()
+
     return JsonResponse(project.getDict(), safe=False)

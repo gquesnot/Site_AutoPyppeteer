@@ -1,11 +1,16 @@
+import json
 import os
 from sys import platform
+from time import time
 
+import requests
+from django.templatetags.static import static
 from pyppeteer import launch
 
 from AAPyppeteer.util.autopuppeteer import AutoPuppeteer
 from AAPyppeteer.util.excel import Excel
 from AAPyppeteer.util.googlesheetapi import GoogleSheetApi
+from AAPyppeteer.util.googleslideapi import GoogleSlideApi
 
 
 class AAController:
@@ -38,55 +43,94 @@ class AAController:
         try:
             for block in self.blocks:
                 datasIn = self.processDatasIn(block)
-                if block['type'] == "Basic":
 
-                    tmpAP = AutoPuppeteer(block, self, self.globalDatas, self.linkedToNextDatas or datasIn)
-                    datasOut, resData, imgs = await tmpAP.run()
-                    self.linkedToNextDatas = []
-                    if imgs is not None:
-                        self.imgs |= imgs
+                tmpAP = AutoPuppeteer(block, self, self.globalDatas, self.linkedToNextDatas or datasIn)
+                datasOut, resData, imgs = await tmpAP.run()
+                self.linkedToNextDatas = []
+                if imgs is not None:
+                    self.imgs |= imgs
+                self.globalDatas = resData
+                print(self.globalDatas, datasOut)
+                self.linkedToNextDatas = self.processDatasOut(block, datasOut)
 
-                    self.linkedToNextDatas = self.processDatasOut(block, datasOut)
-                    self.globalDatas = resData
-
-                else:
-                    print("BLOCK IS DATA")
         except:
             await self.closeBrowser()
         await self.closeBrowser()
-
+        print(self.allDataOut)
         return self.globalDatas, self.allDataOut, self.imgs
 
-    def processDatasIn(self,block):
+    def processDatasIn(self, block):
         if block['datasIn'] is not None:
             datasInC = block['datasIn']
 
-            if datasInC['type']['name'] == "Excel":
+            if datasInC['type']['name'] == "Excel IN":
                 ex = Excel(datasInC['path'])
                 return ex.getValues(datasInC['datas']['start'], datasInC['datas']['end'],
                                     datasInC['datas']['sheetName'])
-            elif datasInC['type']['name'] == "Google Spreadsheet":
+            elif datasInC['type']['name'] == "Google Spreadsheet IN":
                 gs = GoogleSheetApi(datasInC["datas"]['sheetId'])
                 return gs.getValues(datasInC['datas']['start'], datasInC['datas']['end'],
                                     datasInC['datas']['sheetName'])
+            elif datasInC['type']['name'] == "API IN":
+                print(datasInC['datas'])
+                f = requests.get if datasInC['datas']['method'] == "GET" else requests.post
+                params = datasInC['datas']['params']
+                res = f(datasInC['datas']["url"], params=params)
+                print(res)
+                return res.json()
+            elif datasInC['type']['name'] == "JSON IN":
+                return json.loads(datasInC['datas']['datas'])
         return None
 
     def processDatasOut(self, block, datasOut):
 
+
         if datasOut is not None and block['datasOut'] is not None:
             datasOutC = block['datasOut']
-            if datasOutC['name'] == "Excel":
+            tmp = {
+                "name": block['name'],
+                "blockType": datasOutC["type"]['name'],
+            }
+            if datasOutC['type']['name'] == "Excel OUT":
                 ex = Excel()
                 path = ex.insertValues(datasOut)
-                self.allDataOut.append({"url": path, "type": "other", "name": block['name']})
-            elif datasOutC['name'] == "Google Spreadsheet":
+                tmp['type'] = "static"
+                tmp['url'] = path
+            elif datasOutC['type']['name'] == "Google Spreadsheet OUT":
                 print("pass here")
                 gs = GoogleSheetApi()
-                print("pass next")
+
                 path = gs.insertValues(datasOut)
-                print("done")
-                print(path)
-                self.allDataOut.append({"url": path, "type": "static", "name": block['name']})
+
+                tmp['type'] = "normal"
+                tmp['url'] = path
+
+            elif datasOutC['type']['name'] == "Google Slide OUT":
+                gs = GoogleSlideApi()
+                url = gs.createSlide(datasOutC['datas']['templateId'], self.globalDatas)
+
+                tmp['type'] = "normal"
+                tmp['url'] = url.replace("\"", "")
+
+            elif datasOutC['type']['name'] == "API OUT":
+                print(datasOutC['datas'])
+                f = requests.get if datasOutC['datas']['method'] == "GET" else requests.post
+                params = datasOutC['datas']['params']
+                params['datas'] = json.dumps(datasOut)
+                res = f(datasOutC['datas']["url"], params=params)
+                tmp['type'] = "normal"
+                tmp['url'] = datasOutC['datas']['url']
+
+            elif datasOutC['type']['name'] == "JSON OUT":
+                rPath = f"{os.getcwd()}/static/filesOut/{str(int(time()))}.json"
+                with open(rPath, 'w') as f:
+                    json.dump(datasOutC, f)
+                path = rPath.split('/')
+                path = os.path.join(path[-2], path[-1])
+                url = static(path)
+                tmp['type'] = "static"
+                tmp['url'] = url
+            self.allDataOut.append(tmp)
         return datasOut if block['isLinkedToNext'] else []
 
     async def createNewPage(self):

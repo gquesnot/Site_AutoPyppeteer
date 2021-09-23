@@ -10,7 +10,7 @@ from pyppeteer import launch
 
 from Site_Auto import settings
 import django.conf as conf
-
+from bs4 import BeautifulSoup
 
 class AutoPuppeteer:
     nbThread = 0
@@ -119,12 +119,12 @@ class AutoPuppeteer:
         # while maxFail > 0:
         #     try:
         action = await self.configToMethod(action, nextConfig, page)
-            #     break
-            # except:
-            #     sleep(0.5)
-            #     maxFail -= 1
-            #     if maxFail == 0:
-            #         raise ValueError
+        #     break
+        # except:
+        #     sleep(0.5)
+        #     maxFail -= 1
+        #     if maxFail == 0:
+        #         raise ValueError
 
         if action['action'] in ("get js value", "get jquery value"):
             self.applySaveData(action, idx)
@@ -153,12 +153,11 @@ class AutoPuppeteer:
                 for found in founds:
                     action = self.applyFound(action, actionKey, found, idx)
 
-
     def applySaveData(self, action, idx):
         try:
             hint = action['value'].split('.')
             if hint[0] == 'g':
-                self.globalDatas = {action['value']: action['result']}
+                self.globalDatas[hint[1]] = action['result']
             elif hint[0] == "out":
                 idxStr = str(idx)
                 if idxStr not in self.datasOut.keys():
@@ -179,7 +178,7 @@ class AutoPuppeteer:
                 datas = self.globalDatas[hint[1]]
         elif hint[0] == "in" and idx is not None:
             try:
-                datas  = self.datasIn[idx][hint[1]]
+                datas = self.datasIn[idx][hint[1]]
             except:
                 pass
         print(f"REPLACE ON {action['name']} {action['action']} : {actionKey} : {action[actionKey]}=>", end="")
@@ -213,7 +212,7 @@ class AutoPuppeteer:
             action = await self.getJsContent(action, page)
         elif toDo in ("get jquery value", "exec jquery"):
             action = await self.getJqueryContent(action, page)
-        #await page.waitForNavigation()
+        # await page.waitForNavigation()
         return action
         # await self.applyWait(action, nextConfig)
 
@@ -278,11 +277,15 @@ class AutoPuppeteer:
             result = await page.querySelectorEval(action['cssSelector'], f"elem => elem{action['js attr']}")
             print("result", result)
             if action['action'] == "get js value":
-                action['result'] = result
+                action['result'] = self.reformatHtmlValue(result)
         except:
             pass
 
         return action
+
+    def reformatHtmlValue(self, value):
+        soup = BeautifulSoup(value)
+        return soup.prettify(formatter=lambda s: s.replace(u'\xa0', ' '))
 
     async def getJqueryContent(self, action, page):
 
@@ -291,9 +294,8 @@ class AutoPuppeteer:
         try:
             result = await page.querySelectorEval(action['cssSelector'], f"elem => $(elem){action['jquery attr']}")
             if action['action'] == "get jquery value":
-                action['result'] = result
+                action['result'] = self.reformatHtmlValue(result)
         except:
             pass
-
 
         return action
