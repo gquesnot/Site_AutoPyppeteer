@@ -1,5 +1,8 @@
 # SITE AUTOPUPPETEER
 
+The goal of this website is to easily create advanced automations on a headless web browser using [Django](https://www.djangoproject.com/) and  [pyppeteer](https://github.com/pyppeteer/pyppeteer/)
+
+
 
 ## INSTALLATION ON WINDOWS
 
