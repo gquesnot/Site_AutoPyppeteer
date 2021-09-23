@@ -34,7 +34,7 @@ docker-compose -f docker-compose.yml up -d
 - password: password
 
 
-### Google Spreedsheet
+### Google API
 See [installation](https://github.com/gquesnot/Site_AutoPyppeteer/tree/master/INSTALL_GOOGLE_API)
 
 
