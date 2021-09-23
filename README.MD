@@ -32,7 +32,7 @@ docker-compose -f docker-compose.yml up -d
 
 
 ### Google Spreedsheet
-See [installation](https://github.com/gquesnot/Site_AutoPyppeteer/blob/master/INSTALL_GOOGLE_API/INSTALL.MD)
+See [installation](https://github.com/gquesnot/Site_AutoPyppeteer/tree/master/INSTALL_GOOGLE_API)
 
 
 ### TODO
