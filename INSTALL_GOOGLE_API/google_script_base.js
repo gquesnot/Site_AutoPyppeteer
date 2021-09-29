@@ -15,10 +15,32 @@ function doGet(request) {
         else if (type == "create_slide"){
             return createSlide(request)
         }
+        else if (type == "create_doc"){
+            return createDoc(request)
+        }
     }
     return ContentService.createTextOutput("badToken");
 
 
+}
+
+
+function createDoc(request){
+      let templateId = request.parameters.templateId
+    let myDatas = JSON.parse(request.parameters.datas);
+    let file = DriveApp.getFileById(templateId)
+    let folder = DriveApp.getFolderById(myFolderId);
+    let file2 = file.makeCopy()
+    file2.moveTo(folder)
+    let doc = DocumentApp.openById(file2.getId())
+    let docBody= doc.getBody()
+    for (const [key, value] of Object.entries(myDatas)) {
+      docBody.replaceText("{{"+key+"}}",value)
+
+    }
+    let url = doc.getUrl()
+    doc.saveAndClose()
+    return ContentService.createTextOutput(JSON.stringify(url));
 }
 
 function createSlide(request) {

@@ -9,6 +9,7 @@ from pyppeteer import launch
 
 from AAPyppeteer.util.autopuppeteer import AutoPuppeteer
 from AAPyppeteer.util.excel import Excel
+from AAPyppeteer.util.googledocapi import GoogleDocApi
 from AAPyppeteer.util.googlesheetapi import GoogleSheetApi
 from AAPyppeteer.util.googleslideapi import GoogleSlideApi
 
@@ -108,6 +109,12 @@ class AAController:
             elif datasOutC['type']['name'] == "Google Slide OUT":
                 gs = GoogleSlideApi()
                 url = gs.createSlide(datasOutC['datas']['templateId'], self.globalDatas)
+
+                tmp['type'] = "normal"
+                tmp['url'] = url.replace("\"", "")
+            elif datasOutC['type']['name'] == "Google Doc OUT":
+                gd = GoogleDocApi()
+                url = gd.createDoc(datasOutC['datas']['templateId'], self.globalDatas)
 
                 tmp['type'] = "normal"
                 tmp['url'] = url.replace("\"", "")

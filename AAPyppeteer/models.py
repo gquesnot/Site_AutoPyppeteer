@@ -117,8 +117,9 @@ class DataBlockType(models.Model):
 class DataBlock(models.Model):
     name = models.CharField(max_length=200)
     type = models.ForeignKey(DataBlockType, on_delete=models.CASCADE, blank=True, null=True)
+    #datasType = models.CharField(max_length=200, default="")
     datas = models.JSONField(default=dict)
-    path= models.CharField(max_length=200,null=True)
+    path= models.CharField(max_length=200,default="")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
